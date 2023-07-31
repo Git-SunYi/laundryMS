@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <title>洗衣店智能服务系统</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+<!--    <meta name="_csrf" th:content="${_csrf.token}"/>-->
+<!--    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link th:href="@{'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css'}" rel="stylesheet">
+    <link th:href="@{'https://fastly.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css'}" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link th:href="@{/lib/owlcarousel/assets/owl.carousel.min.css}" rel="stylesheet">
+    <link th:href="@{/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css}" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+
+    <link th:href="@{/img/washing.png}" rel="shortcut icon" type="image/x-icon">
+</head>
+
+<body>
+    <div class="container-fluid position-relative d-flex p-0">
+        <!-- Spinner Start -->
+        <div id="spinner" class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <!-- Spinner End -->
+
+        <!-- Sign In Start -->
+        <div class="container-fluid">
+            <div class="row h-100 align-items-center justify-content-center" style="min-height: 100vh;">
+                <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+                    <div class="bg-secondary rounded p-4 p-sm-5 my-4 mx-3">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <a th:href="@{/index}" class="">
+                                <h3 class="text-primary">洗衣店智能服务系统</h3>
+                            </a>
+                            <h3>登录</h3>
+                        </div>
+
+<!--                        <form th:action="@{/login/user_login}" method="get">-->
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="phoneOrAccount" name="phoneOrAccount" required placeholder="name@example.com">
+                                <label for="phoneOrAccount">手机号</label>
+                            </div>
+                            <div class="form-floating mb-4">
+                                <input style="display: inline-block;" type="password" name="password" class="form-control" id="password" required placeholder="请输入密码">
+                                <label for="password">密码</label>
+                                <a href="#" id="passwordEye" style="position: absolute;right: 16px;line-height:58px;">
+                                    <img th:src="@{/img/closed_eyes.png}" id="img" style="width: 24px; height: 24px;">
+                                </a>
+                                <p style="padding-top: 10px;padding-left: 10px;">
+                                    <a th:href="@{#phoneOrAccount}" th:if="${(session.userByPhone eq null) && (session.userByAccount eq null) && (session.phoneOrAccount ne null)}" th:text="'手机号不存在，请重新输入！！！'"></a>
+                                    <a th:href="@{#password}" th:if="${((session.userByPhone ne null) && (session.password eq null) && (session.password2 ne null)) || ((session.userByAccount ne null) && (session.password eq null) && (session.password2 ne null))}" th:text="'密码错误，请重新输入！！！'"></a>
+                                </p>
+                            </div>
+
+                            <script type="text/javascript">
+                                window.addEventListener('load', function (ev) {
+                                    let eye = window.document.getElementById('passwordEye');
+                                    eye.addEventListener('click', function () {
+                                        let pa = window.document.getElementById('password');
+                                        let type = pa.type;
+                                        if (type === 'password') {
+                                            pa.type = 'text';
+                                        } else {
+                                            pa.type = 'password';
+                                        }
+                                        let im = window.document.getElementById('img');
+                                        if (type === 'password') {
+                                            im.src = "/img/eyes_open.png";
+                                        } else {
+                                            im.src = "/img/closed_eyes.png";
+                                        }
+                                    })
+                                })
+                            </script>
+
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="rem_password">
+                                    <label class="form-check-label" for="rem_password">记住密码</label>
+                                </div>
+
+                                <script type="text/javascript">
+                                    var phoneOrAccount = document.querySelector('#phoneOrAccount');
+                                    var u_pass = document.querySelector('#password');
+                                    var rem_phoneOrAccount = document.querySelector('#rem_password');
+                                    var rem_password = document.querySelector('#rem_password');
+                                    if (localStorage.getItem('phoneOrAccount')) {
+                                        phoneOrAccount.value = (localStorage.getItem('phoneOrAccount'))
+                                        rem_phoneOrAccount.checked = true;
+                                    }
+                                    if (localStorage.getItem('u_pass')) {
+                                        u_pass.value = (localStorage.getItem('u_pass'))
+                                        rem_password.checked = true;
+                                    }
+                                    rem_phoneOrAccount.addEventListener('change',function () {
+                                        if (this.checked) {
+                                            localStorage.setItem('phoneOrAccount', phoneOrAccount.value);
+                                        } else {
+                                            localStorage.removeItem('phoneOrAccount');
+                                        }
+                                    })
+                                    rem_password.addEventListener('change',function () {
+                                        if (this.checked) {
+                                            localStorage.setItem('u_pass', u_pass.value);
+                                        } else {
+                                            localStorage.removeItem('u_pass');
+                                        }
+                                    })
+                                </script>
+
+                                <a th:href="@{/login/toForgetPassword}">忘记密码</a>
+                            </div>
+                            <button type="button" onclick="login()" class="btn btn-primary py-3 w-100 mb-4">登录</button>
+                            <p class="text-center mb-0">没有账户? <a th:href="@{/login/toRegister}">注册</a></p>
+<!--                        </form>-->
+                        <script type="text/javascript">
+                            function login(){
+                                    // $.ajax({
+                                    //     success:function (){
+                                    //         window.location.href='/login/user_login?phoneOrAccount='+$("#phoneOrAccount").val()+'&password='+$("#password").val()
+                                    //     }
+                                    // })
+                                $.ajax({
+                                    url:'/login/authLogin',
+                                    dataType:'json',
+                                    type:'post',
+                                    contentType:'application/json;charset=utf-8',
+                                    data:JSON.stringify({
+                                        phoneOrAccount:$("#phoneOrAccount").val(),
+                                        password:$("#password").val()
+                                    }),
+                                    success:function (data){
+                                        window.localStorage.setItem('token',data.payload);
+                                        window.location.href='/login/user_login?phoneOrAccount='+$("#phoneOrAccount").val()+'&password='+$("#password").val()
+                                    }
+                                })
+                            }
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Sign In End -->
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script th:src="@{'https://code.jquery.com/jquery-3.4.1.min.js'}"></script>
+    <script th:src="@{'https://fastly.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js'}"></script>
+    <script th:src="@{/lib/chart/chart.min.js}"></script>
+    <script th:src="@{/lib/easing/easing.min.js}"></script>
+    <script th:src="@{/lib/waypoints/waypoints.min.js}"></script>
+    <script th:src="@{/lib/owlcarousel/owl.carousel.min.js}"></script>
+    <script th:src="@{/lib/tempusdominus/js/moment.min.js}"></script>
+    <script th:src="@{/lib/tempusdominus/js/moment-timezone.min.js}"></script>
+    <script th:src="@{/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js}"></script>
+
+    <!-- Template Javascript -->
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/common.js}"></script>
+</body>
+
+</html>

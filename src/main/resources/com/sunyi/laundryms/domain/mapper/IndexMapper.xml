@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyi.laundryms.domain.mapper.IndexMapper">
+    <resultMap id="findAllOrderMap" type="com.sunyi.laundryms.domain.entity.Order">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="phone" property="phone"/>
+        <result column="category" property="category"/>
+        <result column="clothes_num" property="clothes_num"/>
+        <result column="address" property="address"/>
+        <result column="date" property="date"/>
+        <result column="delivery_time" property="delivery_time"/>
+        <result column="money" property="money"/>
+        <result column="collect" property="collect"/>
+        <result column="delivery" property="delivery"/>
+        <result column="state" property="state"/>
+    </resultMap>
+
+    <resultMap id="commentMap" type="com.sunyi.laundryms.domain.entity.Comment">
+        <id column="id" property="id"/>
+        <result column="phone" property="phone"/>
+        <result column="content" property="content"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="getOrderByKeyWordAndPhone" resultMap="findAllOrderMap">
+        select *
+        from `order`
+        where 1=1
+        <!--        <if test="phone != null and phone != ''">-->
+        and phone = #{phone}
+        <!--        </if>-->
+        and concat(name, phone,clothes_num, address,date,delivery_time, collect, delivery, state) like
+        concat('%', #{keyWord}, '%')
+        order by date
+        limit #{start},#{size}
+    </select>
+    <select id="getAllOrderByPageAndPhone" resultMap="findAllOrderMap">
+        select *
+        from `order`
+        where phone = #{order.phone}
+        order by date desc limit #{start}, #{size}
+    </select>
+    <insert id="addOrderByPhone">
+        insert into `order`(name, phone, category, clothes_num, address, date, delivery_time, money, collect, delivery)
+        values (#{name}, #{phone}, #{category}, #{clothes_num}, #{address}, #{date}, #{delivery_time}, #{money},
+                #{collect}, #{delivery})
+    </insert>
+    <select id="countOrder2" resultType="int">
+        select count(*)
+        from `order`
+    </select>
+    <select id="findAllOrder" resultType="com.sunyi.laundryms.domain.vo.OrderVO">
+        select *
+        from `order`
+        where 1 = 1
+        order by date desc limit #{start}, #{size}
+    </select>
+
+    <select id="findUserByPhone" resultType="com.sunyi.laundryms.domain.entity.User">
+        select *
+        from user
+        where phone = #{phone}
+    </select>
+    <update id="updateUserMoneyByPhone" parameterType="com.sunyi.laundryms.domain.entity.User">
+        update user
+        <set>
+            <if test="user_money != null and user_money != ''">
+                user_money=#{user_money},
+            </if>
+            <if test="user_type != null and user_type != ''">
+                user_type=#{user_type}
+            </if>
+        </set>
+        <where>
+            phone=#{phone}
+        </where>
+    </update>
+
+    <select id="findAllComment" resultType="com.sunyi.laundryms.domain.vo.CommentVO">
+        select content, create_time, name, head_portrait, user_type
+        from comment
+                 left join user on comment.phone = user.phone
+        where 1 = 1
+        order by create_time desc limit #{start}, #{size};
+    </select>
+    <select id="countComment" resultType="int">
+        select count(*)
+        from comment
+    </select>
+    <insert id="addComment">
+        insert into comment(content, create_time, phone)
+        values (#{content}, #{createTime}, #{phone})
+    </insert>
+    <select id="findComment" resultType="com.sunyi.laundryms.domain.vo.CommentVO">
+        select *
+        from comment
+                 inner join user on comment.phone = user.phone
+        order by create_time desc
+    </select>
+
+    <select id="toDaysOrderNum" resultType="integer">
+        SELECT count(*)
+        FROM `order`
+        WHERE TO_DAYS(date) = TO_DAYS(NOW())
+    </select>
+    <select id="toDaysMoney" resultType="Double">
+        SELECT IFNULL(sum(money), 0)
+        FROM `order`
+        WHERE TO_DAYS(date) = TO_DAYS(NOW())
+    </select>
+    <select id="totalMoney" resultType="Double">
+        SELECT IFNULL(sum(money), 0)
+        FROM `order`
+    </select>
+
+    <resultMap id="findCheckInMap" type="com.sunyi.laundryms.domain.entity.CheckIn">
+        <id column="id" property="id"/>
+        <result column="phone" property="phone"/>
+        <result column="check_in_date" property="checkInDate"/>
+        <result column="reward" property="reward"/>
+    </resultMap>
+
+    <select id="findCheckIn" resultMap="findCheckInMap">
+        select *
+        from check_in
+        where DATE_FORMAT(check_in_date, '%Y%m') = DATE_FORMAT(CURDATE(), '%Y%m')
+          and phone = #{phone}
+        order by check_in_date
+    </select>
+
+    <resultMap id="findCheckInDateMap" type="com.sunyi.laundryms.domain.vo.CheckInVO">
+        <result column="current_month_check_in_days" property="currentMonthDays"/>
+        <result column="total_check_in_days" property="totalDays"/>
+        <result column="continuous_check_in_days" property="continuousDays"/>
+        <result column="reward" property="todayReward"/>
+        <result column="total_reward" property="totalReward"/>
+        <result column="same_difference_of_days_rank" property="continuousDaysList"/>
+    </resultMap>
+
+    <select id="findTodayReward" resultMap="findCheckInDateMap">
+        select reward
+        from check_in
+        where TO_DAYS(check_in_date) = TO_DAYS(NOW())
+          and phone = #{phone}
+    </select>
+    <select id="findTotalReward" resultMap="findCheckInDateMap">
+        select IFNULL(sum(reward), 0) as total_reward
+        from check_in
+        where phone = #{phone}
+    </select>
+    <select id="currentMonthCheckInDays" resultMap="findCheckInDateMap">
+        select count(*) as current_month_check_in_days
+        from check_in
+        where DATE_FORMAT(check_in_date, '%Y%m') = DATE_FORMAT(CURDATE(), '%Y%m')
+          and phone = #{phone}
+    </select>
+    <select id="totalCheckInDays" resultMap="findCheckInDateMap">
+        select count(*) as total_check_in_days
+        from check_in
+        where phone = #{phone}
+    </select>
+    <select id="continuousCheckInDays" resultMap="findCheckInDateMap">
+        <bind name="@row_number" value="0"/>
+        select
+        count(difference_of_days) as continuous_check_in_days
+        from (
+        select phone
+        , check_in_date
+        , same_phone_rank
+        , (date_format(check_in_date, "%e") - same_phone_rank) as difference_of_days
+        from (
+        select phone
+        , check_in_date
+        , @row_number := IF(@phone = phone, @row_number + 1, 1) as same_phone_rank
+        , @phone := phone
+        from check_in
+        where phone=#{phone}
+        and DATE_FORMAT(check_in_date, '%Y%m') = DATE_FORMAT(CURDATE(), '%Y%m')
+        order by phone, check_in_date
+        ) t1
+        ) t2
+        where 1=1 group by phone, difference_of_days order by difference_of_days desc limit 0,1
+    </select>
+    <select id="continuousCheckInDaysList" resultMap="findCheckInDateMap">
+        <bind name="@row_number" value="0"/>
+        <bind name="@row_number2" value="0"/>
+        select
+        @row_number2 := IF(@difference_of_days = (date_format(check_in_date, "%e") - same_phone_rank), @row_number2 + 1,
+        1) as same_difference_of_days_rank
+        , @difference_of_days := (date_format(check_in_date, "%e") - same_phone_rank)
+        from (
+        select phone
+        , check_in_date
+        , @row_number := IF(@phone = phone, @row_number + 1, 1) as same_phone_rank
+        , @phone := phone
+        from check_in
+        where phone=#{phone}
+        and DATE_FORMAT(check_in_date, '%Y%m') = DATE_FORMAT(CURDATE(), '%Y%m')
+        order by phone, check_in_date
+        ) t1
+    </select>
+    <insert id="addCheckInDay" parameterType="com.sunyi.laundryms.domain.entity.CheckIn">
+        insert into check_in(phone, check_in_date, reward)
+        values (#{phone}, #{checkInDate}, #{reward}) on duplicate key
+        update reward =
+        values (reward)
+    </insert>
+
+    <resultMap id="findChekInAdminMap" type="com.sunyi.laundryms.domain.entity.CheckInAdmin">
+        <id column="id" property="id"/>
+        <result column="first_reward" property="firstReward"/>
+        <result column="reward_add" property="rewardAdd"/>
+        <result column="continuous_reward" property="continuousReward"/>
+        <result column="create_at" property="createAt"/>
+        <result column="continuous_days" property="continuousDays"/>
+    </resultMap>
+
+    <select id="findChekInAdmin" resultMap="findChekInAdminMap">
+        select *
+        from check_in_admin
+        where 1 = 1
+        order by create_at desc limit 0,1
+    </select>
+</mapper>

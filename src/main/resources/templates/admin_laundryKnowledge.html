@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <title>洗衣店智能服务系统</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+<!--    <meta name="_csrf" th:content="${_csrf.token}"/>-->
+<!--    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link th:href="@{'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css'}" rel="stylesheet">
+    <link th:href="@{'https://fastly.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css'}" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link th:href="@{/lib/owlcarousel/assets/owl.carousel.min.css}" rel="stylesheet">
+    <link th:href="@{/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css}" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+
+    <link th:href="@{/img/washing.png}" rel="shortcut icon" type="image/x-icon">
+
+    <style>
+        .sidebar.pe-4.pb-3::-webkit-scrollbar{
+            width: 8px;
+            height: 8px;
+            background-color: #000000;
+        }
+        .sidebar.pe-4.pb-3::-webkit-scrollbar-thumb{
+            border-radius: 100px;
+            background-color: #6b6d79;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid position-relative d-flex p-0">
+        <!-- Spinner Start -->
+        <div id="spinner" class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <!-- Spinner End -->
+
+
+        <!-- Sidebar Start -->
+        <div class="sidebar pe-4 pb-3">
+            <nav class="navbar bg-secondary navbar-dark">
+                <a th:href="@{/index}" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary">洗衣店服务系统</h3>
+                </a>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="position-relative">
+                        <img class="rounded-circle" th:if="${session.head_portrait ne null}" th:src="${session.head_portrait}" alt="" style="width: 40px; height: 40px;">
+                        <img class="rounded-circle" th:if="${session.head_portrait eq null}" th:src="@{/img/head_portrait/user2.png}" alt="" style="width: 40px; height: 40px;">
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0" th:if="${session.name} eq null" th:text="用户名"></h6>
+                        <h6 class="mb-0" th:if="${session.name} ne null" th:text="${session.name}"></h6>
+                        <span th:if="${session.user_type == null}">身份</span>
+                        <span th:if="${session.user_type != null}" th:text="${session.user_type}"></span>
+                    </div>
+                </div>
+                <div class="navbar-nav w-100">
+                    <a th:href="@{/index}" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>首页</a>
+                    <a th:href="@{/index/membership_card(phone=${session.phone})}" class="nav-item nav-link"><i class="fa fa-laptop me-2"></i>会员卡</a>
+                    <a th:href="@{/index/device_information}" class="nav-item nav-link"><i class="fa fa-th me-2"></i>设备信息</a>
+                    <a th:href="@{/index/laundry_service(phone=${session.phone})}" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>洗衣服务</a>
+                    <a th:href="@{/index/preferential_activities(phone=${session.phone})}" class="nav-item nav-link"><i class="fa fa-table me-2"></i>优惠活动</a>
+                    <a th:href="@{/index/laundry_knowledge}" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>洗衣常识</a>
+                    <div class="nav-item dropdown">
+                        <a th:if="${session.user_type == '管理员'}" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown"><i class="far fa-file-alt me-2"></i>后台管理</a>
+                        <a th:onclick="'ifAdmin();'" th:if="${session.user_type != '管理员'}" class="nav-link dropdown-toggle active"><i class="far fa-file-alt me-2"></i>后台管理</a>
+                        <div class="dropdown-menu bg-transparent border-0" style="padding-left: 40px;padding-top: 0px;">
+                            <a th:href="@{/admin/adminUser}" class="dropdown-item">用户管理</a>
+                            <a th:href="@{/admin/adminClerk}" class="dropdown-item">店员管理</a>
+                            <a th:href="@{/admin/adminDevice}" class="dropdown-item">设备管理</a>
+                            <a th:href="@{/admin/adminOrder}" class="dropdown-item">订单管理</a>
+                            <a th:href="@{/admin/adminDistribution}" class="dropdown-item">衣物取送管理</a>
+                            <a th:href="@{/admin/adminPreferentialActivities}" class="dropdown-item">优惠活动管理</a>
+                            <a th:href="@{/admin/adminLaundryKnowledge}" class="dropdown-item">洗衣常识管理</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <!-- Sidebar End -->
+
+        <script type="text/javascript">
+            // var userType=document.getElementById("userType").value;
+            function ifAdmin(){
+                if ($('#userType').val() !== "管理员"){
+                    window.alert("您不是管理员，无法访问！")
+                }
+            }
+        </script>
+
+        <!-- Content Start -->
+        <div class="content">
+            <!-- Navbar Start -->
+            <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
+                <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
+                    <h2 class="text-primary mb-0"><i class="fa fa-user-edit"></i></h2>
+                </a>
+                <a href="#" class="sidebar-toggler flex-shrink-0">
+                    <i class="fa fa-bars"></i>
+                </a>
+                <form class="d-none d-md-flex ms-4">
+                    <input class="form-control bg-dark border-0" type="search" placeholder="洗衣常识管理" readonly>
+                </form>
+                <div class="navbar-nav align-items-center ms-auto">
+                    <div class="nav-item dropdown">
+                        <a onclick="findComment()" href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fa fa-envelope me-lg-2"></i>
+                            <span class="d-none d-lg-inline-flex">评论留言</span>
+                        </a>
+                        <div id="findComment" class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+<!--                            <a href="#" class="dropdown-item">-->
+<!--                                <div class="d-flex align-items-center">-->
+<!--                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">-->
+<!--                                    <div class="ms-2">-->
+<!--                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>-->
+<!--                                        <small>15 minutes ago</small>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </a>-->
+<!--                            <hr class="dropdown-divider">-->
+<!--                            <a href="#" class="dropdown-item">-->
+<!--                                <div class="d-flex align-items-center">-->
+<!--                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">-->
+<!--                                    <div class="ms-2">-->
+<!--                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>-->
+<!--                                        <small>15 minutes ago</small>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </a>-->
+<!--                            <hr class="dropdown-divider">-->
+<!--                            <a href="#" class="dropdown-item">-->
+<!--                                <div class="d-flex align-items-center">-->
+<!--                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">-->
+<!--                                    <div class="ms-2">-->
+<!--                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>-->
+<!--                                        <small>15 minutes ago</small>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </a>-->
+<!--                            <hr class="dropdown-divider">-->
+<!--                            <a href="#" class="dropdown-item text-center">See all message</a>-->
+                        </div>
+                    </div>
+                    <div th:if="${session.user_type == '管理员'}" class="nav-item dropdown">
+                        <a onclick="findOrder()" href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fa fa-bell me-lg-2"></i>
+                            <span class="d-none d-lg-inline-flex">订单通知</span>
+                        </a>
+                        <div id="findOrder" class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+                            <a href="#" class="dropdown-item">
+                                <h6 class="fw-normal mb-0">Profile updated</h6>
+                                <small>15 minutes ago</small>
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="#" class="dropdown-item">
+                                <h6 class="fw-normal mb-0">New user added</h6>
+                                <small>15 minutes ago</small>
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="#" class="dropdown-item">
+                                <h6 class="fw-normal mb-0">Password changed</h6>
+                                <small>15 minutes ago</small>
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="#" class="dropdown-item text-center">See all notifications</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a th:href="@{/login/toLogin}" class="nav-link" th:if="${session.name} eq null" style="padding-right: 20px;padding-left: 20px;">
+                            <img class="rounded-circle me-lg-2" th:if="${session.head_portrait ne null}" th:src="${session.head_portrait}" alt="" style="width: 40px; height: 40px;">
+                            <img class="rounded-circle me-lg-2" th:if="${session.head_portrait eq null}" th:src="@{/img/head_portrait/user2.png}" alt="" style="width: 40px; height: 40px;">
+                            登录
+                        </a>
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" th:if="${session.name} ne null" style="padding-right: 20px;padding-left: 20px;">
+                            <img class="rounded-circle me-lg-2" th:if="${session.head_portrait ne null}" th:src="${session.head_portrait}" alt="" style="width: 40px; height: 40px;">
+                            <img class="rounded-circle me-lg-2" th:if="${session.head_portrait eq null}" th:src="@{/img/head_portrait/user2.png}" alt="" style="width: 40px; height: 40px;">
+                            <span class="d-none d-lg-inline-flex" th:text="${session.name}"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0"
+                             style="padding-left: 20px;left: 0px;padding-right: 20px;padding-bottom: 12px;">
+                            <a th:href="@{'/user/toUserCenter?phone='+${session.phone}}" class="dropdown-item">个人中心</a>
+                            <a th:href="@{/login/login_out}" class="dropdown-item">退出登录</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <!-- Navbar End -->
+
+            <!-- Widget Start -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="row g-4">
+                    <div class="col-12" id="col" style="height: 1500px">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="laundryKnowledgeUrl" name="laundryKnowledgeUrl" disabled placeholder="name@example.com">
+                                <label for="laundryKnowledgeUrl" th:text="'当前洗衣常识url地址：'+${LaundryKnowledge.laundryKnowledgeUrl}"></label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="url" class="form-control" id="addLaundryKnowledgeUrl" name="addLaundryKnowledgeUrl" placeholder="name@example.com" style="background-color: #e9ecef;">
+                                <label for="addLaundryKnowledgeUrl" th:text="'设置洗衣常识url地址：'"></label>
+                                <button type="button" th:onclick="addLaundryKnowledgeUrl();" class="btn btn-primary" style="position: absolute;width: 68px;height: 43.6px;margin-left: 5px;top: 7px;right: 20px;">确认</button>
+                            </div>
+                            <iframe class="position-relative rounded w-100 h-100"
+                                    th:src="${LaundryKnowledge.laundryKnowledgeUrl}"
+                                    frameborder="0" allowfullscreen="" aria-hidden="false"
+                                    tabindex="0" style="filter: grayscale(100%) contrast(100%) ; border: 0;"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Widget End -->
+            <script type="text/javascript">
+                function isUrl(str) {
+                    var v = new RegExp('^(?!mailto:)(?:(?:http|https|ftp)://|//)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$', 'i');
+                    return v.test(str);
+                }
+                function addLaundryKnowledgeUrl(){
+                    if (isUrl($('#addLaundryKnowledgeUrl').val()) === false){
+                        alert("请输入正确的url地址")
+                    }else if (confirm("确认改变洗衣常识的url地址吗？")){
+                        $.ajax({
+                            type: 'post',
+                            url: '/admin/addLaundryKnowledgeUrl',
+                            dataType:'json',  //表示返回的数据必须为json，否则：会走下面error对应的方法。
+                            contentType:'application/json;charset=utf-8',  //如果要发送json字符串，此属性不能少；否则，会出现后台会报异常
+                            data:JSON.stringify({    //将json对象转换为json字符串，不能直接传json对象
+                                laundryKnowledgeUrl: $('#addLaundryKnowledgeUrl').val(),
+                                state:1
+                            }),
+                            // data:{
+                            //     laundryKnowledgeUrl: $('#addLaundryKnowledgeUrl').val()
+                            //     state:1
+                            // },
+                            success: function (result){
+                                // alert(result.payload.laundryKnowledgeUrl)  //取后端传来的数据，payload:响应数据
+                                if (result && result.success){
+                                    window.alert("设置成功url地址："+result.payload.laundryKnowledgeUrl || result.payload)
+                                    window.location.reload();
+                                }else {
+                                    window.alert("设置失败" || result.msg)
+                                }
+                            }
+                        })
+                    }
+                }
+            </script>
+
+        </div>
+        <!-- Content End -->
+
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script th:src="@{'https://code.jquery.com/jquery-3.4.1.min.js'}"></script>
+    <script th:src="@{'https://fastly.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js'}"></script>
+    <script th:src="@{/lib/chart/chart.min.js}"></script>
+    <script th:src="@{/lib/easing/easing.min.js}"></script>
+    <script th:src="@{/lib/waypoints/waypoints.min.js}"></script>
+    <script th:src="@{/lib/owlcarousel/owl.carousel.min.js}"></script>
+    <script th:src="@{/lib/tempusdominus/js/moment.min.js}"></script>
+    <script th:src="@{/lib/tempusdominus/js/moment-timezone.min.js}"></script>
+    <script th:src="@{/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js}"></script>
+
+    <!-- Template Javascript -->
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/common.js}"></script>
+</body>
+
+</html>

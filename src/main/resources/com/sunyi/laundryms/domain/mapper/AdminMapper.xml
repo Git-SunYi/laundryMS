@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyi.laundryms.domain.mapper.AdminMapper">
+    <resultMap id="LaundryKnowledgeMap" type="com.sunyi.laundryms.domain.entity.LaundryKnowledge">
+        <id column="id" property="id"/>
+        <result column="laundry_knowledge_url" property="laundryKnowledgeUrl"/>
+        <result column="state" property="state"/>
+    </resultMap>
+
+    <insert id="addLaundryKnowledgeUrl">
+        insert into laundry_knowledge(laundry_knowledge_url,state) values (#{laundryKnowledgeUrl},#{state})
+        on duplicate key update state=values (state)
+    </insert>
+    <update id="updateAllLaundryKnowledge">
+        update laundry_knowledge set state=0
+    </update>
+    <select id="findLaundryKnowledgeUrl" resultMap="LaundryKnowledgeMap">
+        select * from laundry_knowledge where state=1
+    </select>
+
+    <insert id="addCheckInAdmin" parameterType="com.sunyi.laundryms.domain.entity.CheckInAdmin">
+        insert into check_in_admin(first_reward,reward_add,continuous_reward,create_at,continuous_days)
+        values (#{firstReward},#{rewardAdd},#{continuousReward},#{createAt},#{continuousDays})
+    </insert>
+</mapper>

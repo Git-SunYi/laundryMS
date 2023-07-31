@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <meta charset="utf-8">
+    <title>洗衣店智能服务系统</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+<!--    <meta name="_csrf" th:content="${_csrf.token}"/>-->
+<!--    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link th:href="@{'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css'}" rel="stylesheet">
+    <link th:href="@{'https://fastly.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css'}" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link th:href="@{/lib/owlcarousel/assets/owl.carousel.min.css}" rel="stylesheet">
+    <link th:href="@{/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css}" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+
+    <link th:href="@{/img/washing.png}" rel="shortcut icon" type="image/x-icon">
+</head>
+
+<body>
+    <div class="container-fluid position-relative d-flex p-0">
+        <!-- Spinner Start -->
+        <div id="spinner" class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <!-- Spinner End -->
+
+        <!-- Sign In Start -->
+        <div class="container-fluid">
+            <div class="row h-100 align-items-center justify-content-center" style="min-height: 100vh;">
+                <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+                    <div class="bg-secondary rounded p-4 p-sm-5 my-4 mx-3">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <a th:href="@{/index}" class="">
+                                <h3 class="text-primary">洗衣店智能服务系统</h3>
+                            </a>
+                            <h3>注册</h3>
+                        </div>
+                        <form th:action="@{/login/register}" method="get">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="name@example.com">
+                            <label for="name">用户名</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="phone" name="phone" required pattern="^1[3456789][0-9]{9}" placeholder="name@example.com">
+                            <label for="phone">手机 [+86 xxx xxxx xxxx]</label>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input style="display: inline-block" type="password" class="form-control" id="password1" name="password1" pattern="[A-Za-z0-9.]{6,18}" required placeholder="请输入密码">
+                            <label for="password1">密码 [长度6-18个字符,不包括特殊字符]</label>
+                            <a href="#" id="passwordEye1" style="position: absolute;right: 16px;line-height:58px;">
+                                <img th:src="@{/img/closed_eyes.png}" id="img1" style="width: 24px; height: 24px;">
+                            </a>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input style="display: inline-block" type="password" class="form-control" id="password2" name="password2" required placeholder="请确认密码">
+                            <label for="password2">密码确认</label>
+                            <a href="#" id="passwordEye2" style="position: absolute;right: 16px;line-height:58px;">
+                                <img th:src="@{/img/closed_eyes.png}" id="img2" style="width: 24px; height: 24px;">
+                            </a>
+                            <p style="padding-top: 6px;padding-left: 10px;">
+                                <a th:href="@{#phone}" th:if="${session.user != null}" th:text="'该手机号已注册，请重新输入！'"></a>
+                                <a th:href="@{#password1}" th:if="${session.user == null && session.password1 ne session.password2}" th:text="'密码不一致，请重新输入！'"></a>
+                            </p>
+                        </div>
+
+                        <script type="text/javascript">
+                            window.addEventListener('load',function (ev) {
+                                let eye1 = window.document.getElementById('passwordEye1');
+                                eye1.addEventListener('click',function () {
+                                    let pa1 =  window.document.getElementById('password1');
+                                    let type = pa1.type;
+                                    if (type === 'password'){
+                                        pa1.type = 'text';
+                                    }else{
+                                        pa1.type = 'password';
+                                    }
+                                    let im1 = window.document.getElementById('img1');
+                                    if (type === 'password'){
+                                        im1.src="/img/eyes_open.png";
+                                    }else{
+                                        im1.src="/img/closed_eyes.png";
+                                    }
+                                })
+                                let eye2 = window.document.getElementById('passwordEye2');
+                                eye2.addEventListener('click',function () {
+                                    let pa2 =  window.document.getElementById('password2');
+                                    let type = pa2.type;
+                                    if (type === 'password'){
+                                        pa2.type = 'text';
+                                    }else{
+                                        pa2.type = 'password';
+                                    }
+                                    let im2 = window.document.getElementById('img2');
+                                    if (type === 'password'){
+                                        im2.src="/img/eyes_open.png";
+                                    }else{
+                                        im2.src="/img/closed_eyes.png";
+                                    }
+                                })
+                            })
+                        </script>
+
+                        <button type="submit" class="btn btn-primary py-3 w-100 mb-4">注册</button>
+                        <p class="text-center mb-0">已有账户！<a th:href="@{/login/toLogin}">登录</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Sign In End -->
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script th:src="@{'https://code.jquery.com/jquery-3.4.1.min.js'}"></script>
+    <script th:src="@{'https://fastly.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js'}"></script>
+    <script th:src="@{/lib/chart/chart.min.js}"></script>
+    <script th:src="@{/lib/easing/easing.min.js}"></script>
+    <script th:src="@{/lib/waypoints/waypoints.min.js}"></script>
+    <script th:src="@{/lib/owlcarousel/owl.carousel.min.js}"></script>
+    <script th:src="@{/lib/tempusdominus/js/moment.min.js}"></script>
+    <script th:src="@{/lib/tempusdominus/js/moment-timezone.min.js}"></script>
+    <script th:src="@{/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js}"></script>
+
+    <!-- Template Javascript -->
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/common.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+server:
+  port: 9070
+spring:
+  profiles:
+    active: jdbc,redis,jwt  #外置jdbc、redis、jwt配置文件
+#  datasource:
+#    url: jdbc:mysql://127.0.0.1:3306/laundryms?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf-8
+#    username: root
+#    password: Sunyi158945510
+#    type: com.alibaba.druid.pool.DruidDataSource
+#    druid:
+#      initial-size: 20
+#      min-idle: 10
+#      max-active: 100
+  servlet:
+    multipart:
+      max-file-size: -1     #单文件上传不限制大小
+      max-request-size: -1  #多文件上传不限制大小
+
+#浏览器cookie相关设置
+COOKIE:
+  # 设置cookie默认时长为30分钟
+  VALIDITY: 1800
+
+#mybatis:
+#  configuration:
+#    map-underscore-to-camel-case: true #开启数据库字段驼峰转换:根据数据库字段名的下划线实体类属性字段进行驼峰式命名
+#  springMVC静态资源释放
+#  mvc:
+#    static-path-pattern: /static/**
